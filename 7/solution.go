@@ -35,9 +35,7 @@ func buildTree(lines []string, n Node) Node {
 	var size int
 	var isDir bool
 	var currentDir *Node
-	var parent *Node
 	currentDir = &n
-	parent = &n
 	for _, line := range lines {
 		// cd
 		re := regexp.MustCompile(`\$ cd (\/|\.\.|[a-z]+)*`)
@@ -47,7 +45,6 @@ func buildTree(lines []string, n Node) Node {
 			if dir == ".." {
 				// move currentDir up one
 				currentDir = currentDir.parent
-				parent = currentDir
 			} else {
 				// have to find this directory in current node's children
 				for _, cn := range currentDir.children {
@@ -56,7 +53,6 @@ func buildTree(lines []string, n Node) Node {
 						break
 					}
 				}
-				parent = currentDir
 			}
 			continue
 		}
@@ -82,7 +78,7 @@ func buildTree(lines []string, n Node) Node {
 				panic("Something went wrong parsing the files")
 			}
 		}
-		childNode := Node{name, parent, isDir, size, []*Node{}}
+		childNode := Node{name, currentDir, isDir, size, []*Node{}}
 		currentDir.children = append(currentDir.children, &childNode)
 	}
 	return n
